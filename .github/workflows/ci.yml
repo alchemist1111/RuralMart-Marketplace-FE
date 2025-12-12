@@ -1,0 +1,40 @@
+name: Ruralmart CI Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to the main branch
+  pull_request:
+    branches:
+      - main  # Trigger on pull request targeting the main branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout the code from GitHub
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    # Set up Node.js environment
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '25'
+
+    # Install dependencies
+    - name: Install dependencies
+      run: npm install
+
+    # Run tests
+    - name: Run tests
+      run: npm test
+
+    # Run linting
+    - name: Run linting
+      run: npm run lint
+
+    # Build the app
+    - name: Build the app
+      run: npm run build

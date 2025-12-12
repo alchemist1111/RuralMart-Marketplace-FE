@@ -1,0 +1,38 @@
+# name: Ruralmart CI Pipeline
+
+# on:
+#   push:
+#     branches:
+#       - main  # Trigger on push to the main branch after CI completes
+
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     # Checkout the code from GitHub
+#     - name: Checkout repository
+#       uses: actions/checkout@v2
+
+#     # Set up Node.js environment
+#     - name: Set up Node.js
+#       uses: actions/setup-node@v2
+#       with:
+#         node-version: '25' 
+
+#     # Install dependencies
+#     - name: Install dependencies
+#       run: npm install
+
+#     # Build the app
+#     - name: Build the app
+#       run: npm run build
+
+#     # Deploy to Render
+#     - name: Deploy to Render
+#       if: success()
+#       run: |
+#         curl -X POST \
+#           -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+#           -d '{"serviceId": "${{ secrets.RENDER_SERVICE_ID }}"}' \
+#           https://api.render.com/deploy/sync

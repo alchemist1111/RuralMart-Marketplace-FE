@@ -1,0 +1,1 @@
+// Cart state management (items, total, etc.)

@@ -1,0 +1,1 @@
+// User state management (user info, auth state)

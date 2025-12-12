@@ -1,6 +1,7 @@
 // User state management (user info, auth state)
 import { createSlice } from '@reduxjs/toolkit';
 import { registerUser } from '../actions/userActions';
+import { LOGIN, LOGOUT, REGISTER, SET_USER } from '../types/userTypes';
 
 const initialState = {
     user: null,
@@ -12,10 +13,10 @@ const userSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
-       setUser: (state, action) => {
+       [SET_USER]: (state, action) => {
           state.user = action.payload;
        },
-       logout: (state) => {
+       [LOGOUT]: (state) => {
           state.user = null;
        },
     },

@@ -1,8 +1,9 @@
 //  User-related actions (login, register, etc.)
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { REGISTER } from '../types/userTypes';
 
 export const registerUser = createAsyncThunk(
-    'user/registerUser',
+    REGISTER,
     async(userData, thunkAPI) => {
        try {
           // Register API call

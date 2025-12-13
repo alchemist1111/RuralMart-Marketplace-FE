@@ -1,27 +1,34 @@
 // User state management (user info, auth state)
 import { createSlice } from '@reduxjs/toolkit';
-import { registerUser } from '../actions/userActions';
-import { LOGIN, LOGOUT, REGISTER, SET_USER } from '../types/userTypes';
+import { registerUser, userLogin, refreshAccessToken } from '../actions/userActions';
 
 const initialState = {
     user: null,
     status: 'idle',
-    error: null
+    error: null,
+    accessToken: null,
+    refreshToken: null,
 };
 
 const userSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
-       [SET_USER]: (state, action) => {
+       setUser: (state, action) => {
           state.user = action.payload;
        },
-       [LOGOUT]: (state) => {
+       logout: (state) => {
           state.user = null;
+          state.accessToken = null;
+          state.refreshToken = null;
+          localStorage.removeItem("accessToken");
+          document.cookie =
+                 "refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
        },
     },
     extraReducers: (builder) => {
         builder
+           // Register user
            .addCase(registerUser.pending, (state) => {
                  state.status = 'loading';
            })
@@ -32,6 +39,24 @@ const userSlice = createSlice({
            .addCase(registerUser.rejected, (state, action) => {
                  state.status = 'failed';
                  state.error = action.payload;
+           })
+
+           // User login
+           .addCase(userLogin.pending, (state) => {
+                 state.status = 'loading';
+           })
+           .addCase(userLogin.fulfilled, (state, action) => {
+                 state.status = 'succeeded';
+                 state.user = action.payload.user || action.payload;
+                 state.accessToken = action.payload.accessToken || null;
+                 state.refreshToken = action.payload.refreshToken || null;
+           })
+           .addCase(userLogin.rejected, (state, action) => {
+                 state.status = 'failed';
+                 state.error = action.payload;
+           })
+           .addCase(refreshAccessToken.fulfilled, (state, action) => {
+                 state.accessToken = action.payload.accessToken || state.accessToken;
            });
     },
 });

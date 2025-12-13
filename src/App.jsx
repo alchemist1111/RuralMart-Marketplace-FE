@@ -1,11 +1,17 @@
-import { useState } from 'react'
-import './App.css'
+import { useState } from 'react';
+import './App.css';
+import Register from './pages/auth/Register';
+import Login from './pages/auth/Login';
+// import Home from './pages/homepage/Home';
+import { Routes, Route } from "react-router-dom";
 
 function App() {
   return (
-    <div className="text-3xl font-bold underline">
-      <h1>Hello World!</h1>
-    </div>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      {/* <Route path="/home" element={<Home />} /> */}
+    </Routes>
   );
 }
 

@@ -2,131 +2,177 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { registerUser } from '../../redux/actions/userActions';
 import { useNavigate } from 'react-router-dom';
-
+import RuralmartLogo from '../../assets/RuralmartLogo.jpg';
+import background_image from '../../assets/background_image.png';
 
 const Register = () => {
-    const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phoneNumber: '',
-        role: 'buyer', // Default role
-        password: '',
-    });
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
+    role: 'buyer',
+    password: '',
+    confirmPassword: '',
+  });
 
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }
 
-    function handleChange(e) {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({ ...prevData, [name]: value}));
+  function handleSubmit(e) {
+    e.preventDefault();
+    setError('');
+
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.phoneNumber || !formData.password) {
+      setError('Please fill in all required fields.');
+      return;
     }
 
-    function handleSubmit(e) {
-        e.preventDefault();
-        dispatch(registerUser(formData)); // Dispatching the Action
-        navigate('/login') // Redirecting to login page after successful registration
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match.');
+      return;
     }
 
+    dispatch(registerUser(formData));
+    navigate('/login');
+  }
 
-    return(
-        <div className="max-w-4xl mx-auto bg-white p-8 shadow-lg rounded-md flex items-center space-x-8">
-            {/* Image side section */}
-            <div className="flex-1">
-                <img src="your-image-url-here" alt="Your Image" className="w-full h-auto rounded-md" />
-            </div>
-            
-            {/* Form side section */}
-            <div className="flex-1">
-                <h2 className="text-2xl font-bold mb-4">Register</h2>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                    <label htmlFor="firstName" className="block text-sm font-medium">First Name</label>
-                    <input
-                        type="text"
-                        id="firstName"
-                        name="firstName"
-                        value={formData.firstName}
-                        onChange={handleChange}
-                        className="mt-1 p-2 w-full border rounded-md"
-                    />
-                    </div>
-
-                    <div>
-                    <label htmlFor="lastName" className="block text-sm font-medium">Last Name</label>
-                    <input
-                        type="text"
-                        id="lastName"
-                        name="lastName"
-                        value={formData.lastName}
-                        onChange={handleChange}
-                        className="mt-1 p-2 w-full border rounded-md"
-                    />
-                    </div>
-
-                    <div>
-                    <label htmlFor="email" className="block text-sm font-medium">Email</label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="mt-1 p-2 w-full border rounded-md"
-                    />
-                    </div>
-
-                    <div>
-                    <label htmlFor="phoneNumber" className="block text-sm font-medium">Phone Number</label>
-                    <input
-                        type="text"
-                        id="phoneNumber"
-                        name="phoneNumber"
-                        value={formData.phoneNumber}
-                        onChange={handleChange}
-                        className="mt-1 p-2 w-full border rounded-md"
-                    />
-                    </div>
-
-                    <div>
-                    <label htmlFor="role" className="block text-sm font-medium">Role</label>
-                    <select
-                        id="role"
-                        name="role"
-                        value={formData.role}
-                        onChange={handleChange}
-                        className="mt-1 p-2 w-full border rounded-md"
-                    >
-                        <option value="vendor">Vendor</option>
-                        <option value="admin">Admin</option>
-                        <option value="buyer">Buyer</option>
-                    </select>
-                    </div>
-
-                    <div>
-                    <label htmlFor="password" className="block text-sm font-medium">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        className="mt-1 p-2 w-full border rounded-md"
-                    />
-                    </div>
-
-                    <button
-                    type="submit"
-                    className="w-full py-2 px-4 bg-blue-500 text-white rounded-md mt-4 hover:bg-blue-600"
-                    >
-                    Register
-                    </button>
-                </form>
-            </div>
+  return (
+    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 p-4">
+      <div className="w-full max-w-5xl bg-white rounded-xl shadow-xl overflow-hidden flex flex-col md:flex-row">
+        {/* left - logo / promo */}
+        <div className="w-full md:w-1/2 bg-emerald-50 flex items-center justify-center p-8 md:p-12">
+          <div className="text-center">
+            <img src={RuralmartLogo} alt="Ruralmart" className="mx-auto h-40 w-auto object-contain" />
+            <h3 className="mt-6 text-2xl font-bold text-emerald-700">Welcome to Ruralmart</h3>
+            <p className="mt-2 text-gray-600 px-6 md:px-12">Buy and sell locally sourced goods with ease.</p>
+          </div>
         </div>
-    )
-}
+
+        {/* right - form */}
+        <div className="w-full md:w-1/2 p-8 md:p-10">
+            <h2 className="text-3xl font-bold text-gray-800 mb-2 text-center md:text-left">Create your account</h2>
+            <p className="text-gray-500 mb-6 text-center md:text-left">Join Ruralmart and start selling or shopping today.</p>
+
+            {error && <div className="mb-4 text-sm text-red-600">{error}</div>}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    placeholder="First name"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    placeholder="Last name"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="Enter your email"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                  <input
+                    type="tel"
+                    name="phoneNumber"
+                    value={formData.phoneNumber}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    placeholder="Enter phone number"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                  <select
+                    name="role"
+                    value={formData.role}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  >
+                    <option value="buyer">Buyer</option>
+                    <option value="seller">Seller</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    placeholder="Enter password"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    placeholder="Confirm password"
+                    required
+                  />
+                </div>
+              </div>
+
+              <button type="submit" className="w-full mt-2 py-2.5 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition">
+                Register
+              </button>
+
+              <p className="text-sm text-gray-500 text-center mt-3">
+                Already have an account?{' '}
+                <a href="/login" className="text-emerald-600 font-medium hover:underline">Login</a>
+              </p>
+            </form>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default Register;
-

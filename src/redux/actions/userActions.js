@@ -1,6 +1,6 @@
 //  User-related actions (login, register, etc.)
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { REGISTER } from '../types/userTypes';
+import { REGISTER, FORGOT_PASSWORD } from '../types/userTypes';
 import { LOGIN } from '../types/userTypes';
 import {ACCESS_TOKEN_REFRESH} from '../types/userTypes';
 
@@ -114,3 +114,35 @@ export const refreshAccessToken = createAsyncThunk(
     }
   }
 );
+
+// Forgot password
+export const forgotPassword = createAsyncThunk(
+  FORGOT_PASSWORD,
+  async (email, thunkAPI) => {
+    try {
+      // Forgot password API call
+      const response = await fetch('/api/forgot_password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+
+        body: JSON.stringify({email})
+      });
+
+      // Check if the response is successful
+      if(!response.ok) {
+        // If the response is not OK, throw an error
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Something went wrong!');
+      }
+
+      // Return the response data if the API call was successful
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      // Return the error message if there was an issue with the API call
+      return thunkAPI.rejectWithValue(error.message || 'Unknown error');
+    }
+  }
+)

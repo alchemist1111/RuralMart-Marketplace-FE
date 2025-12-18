@@ -1,6 +1,6 @@
 //  User-related actions (login, register, etc.)
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { REGISTER, FORGOT_PASSWORD } from '../types/userTypes';
+import { REGISTER, FORGOT_PASSWORD, CHANGE_PASSWORD } from '../types/userTypes';
 import { LOGIN } from '../types/userTypes';
 import {ACCESS_TOKEN_REFRESH} from '../types/userTypes';
 
@@ -47,7 +47,7 @@ export const userLogin = createAsyncThunk(
             });
 
             if(!response.ok) {
-                throw new error('Login failed.');
+                throw new Error('Login failed.');
             }
 
             const data = await response.json();
@@ -145,4 +145,36 @@ export const forgotPassword = createAsyncThunk(
       return thunkAPI.rejectWithValue(error.message || 'Unknown error');
     }
   }
-)
+);
+
+
+// Change password
+export const changePassword = createAsyncThunk(
+  CHANGE_PASSWORD,
+  async ({password, token}, thunkAPI) => {
+    try {
+      // Change password API call
+      const response = await fetch('/api/change_password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+
+        body: JSON.stringify({ password, token }),
+
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to change password');
+      }
+
+      const data = await response.json();
+      return data;
+      
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message || 'Unknown error');
+    }
+  }
+
+);

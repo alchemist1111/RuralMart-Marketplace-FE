@@ -1,6 +1,6 @@
 // User state management (user info, auth state)
 import { createSlice } from '@reduxjs/toolkit';
-import { registerUser, userLogin, refreshAccessToken, forgotPassword } from '../actions/userActions';
+import { registerUser, userLogin, refreshAccessToken, forgotPassword, changePassword } from '../actions/userActions';
 
 const initialState = {
     user: null,
@@ -76,8 +76,26 @@ const userSlice = createSlice({
                  state.status = 'failed';
                  state.errorMessage = action.payload || 'Failed to send password reset email.';
                  state.successMessage = null;
-           });
-    },
+           })
+
+           // Change passowrd
+           .addCase(changePassword.pending, (state) => {
+                 state.status = 'loading';
+                 state.successMessage = null; // Clear any previous success message
+                 state.errorMessage = null; // Clear any previous error message
+            })
+            .addCase(changePassword.fulfilled, (state, action) => {
+                 state.status = 'succeeded';
+                 state.successMessage = action.payload.message || 'Password changed successfully!';
+                 state.errorMessage = null;
+            })
+            .addCase(changePassword.rejected, (state, action) => {
+                 state.status = 'failed';
+                 state.errorMessage = action.payload || 'Failed to change password.';
+                 state.successMessage = null;
+            });
+
+      },
 });
 
 export const { setUser, logout } = userSlice.actions;

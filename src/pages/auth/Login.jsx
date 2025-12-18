@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { userLogin } from '../../redux/actions/userActions';
 import { useNavigate } from 'react-router-dom';
+import { selectUserLoading, selectUserErrorMessage } from '../../redux/selectors/userSelectors';
 import RuralmartLogo from '../../assets/RuralmartLogo.jpg';
 
 const Login = () => {
     const [formData, setFormData] = useState({ email: '', password: '' });
-    const [error, setError] = useState('');
+    const [localError, setLocalError] = useState('');
     const [remember, setRemember] = useState(false);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const isLoading = useSelector(selectUserLoading);
+    const reduxError = useSelector(selectUserErrorMessage);
 
     function handleChange(e) {
         const { name, value } = e.target;
@@ -19,16 +22,18 @@ const Login = () => {
 
     function handleSubmit(e) {
         e.preventDefault();
-        setError('');
+        setLocalError('');
 
         if (!formData.email || !formData.password) {
-            setError('Please fill in both email and password');
+            setLocalError('Please fill in both email and password');
             return;
         }
 
-        // Dispatch login and navigate. If your action returns a promise you can chain.
-        dispatch(userLogin(formData));
-        navigate('/home');
+        dispatch(userLogin(formData)).then(() => {
+            navigate('/home');
+        }).catch(() => {
+            // Error handled by Redux
+        });
     }
 
     return (
@@ -46,7 +51,8 @@ const Login = () => {
                 {/* right: form */}
                 <div className="w-full md:w-1/2 p-8 md:p-12">
                     <h2 className="text-3xl font-bold text-gray-800 mb-4 text-center md:text-left">Login</h2>
-                    {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+                    {localError && <p className="text-red-500 text-center mb-4 text-sm">{localError}</p>}
+                    {reduxError && <p className="text-red-500 text-center mb-4 text-sm">{reduxError}</p>}
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
@@ -84,8 +90,8 @@ const Login = () => {
                             <a href="/forgot-password" className="text-sm text-emerald-600 hover:underline">Forgot Password?</a>
                         </div>
 
-                        <button type="submit" className="w-full py-3 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition">
-                            Login
+                        <button type="submit" className="w-full py-3 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition disabled:opacity-50" disabled={isLoading}>
+                            {isLoading ? 'Logging in...' : 'Login'}
                         </button>
 
                         <p className="text-sm text-center text-gray-500">

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { registerUser } from '../../redux/actions/userActions';
 import { useNavigate } from 'react-router-dom';
+import { selectUserLoading, selectUserErrorMessage } from '../../redux/selectors/userSelectors';
 import RuralmartLogo from '../../assets/RuralmartLogo.jpg';
-import background_image from '../../assets/background_image.png';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -19,6 +19,8 @@ const Register = () => {
   const [error, setError] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const isLoading = useSelector(selectUserLoading);
+  const reduxError = useSelector(selectUserErrorMessage);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -39,8 +41,11 @@ const Register = () => {
       return;
     }
 
-    dispatch(registerUser(formData));
-    navigate('/login');
+    dispatch(registerUser(formData)).then(() => {
+      navigate('/login');
+    }).catch(() => {
+      // Error handled by Redux
+    });
   }
 
   return (
@@ -61,6 +66,7 @@ const Register = () => {
             <p className="text-gray-500 mb-6 text-center md:text-left">Join Ruralmart and start selling or shopping today.</p>
 
             {error && <div className="mb-4 text-sm text-red-600">{error}</div>}
+            {reduxError && <div className="mb-4 text-sm text-red-600">{reduxError}</div>}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -160,8 +166,8 @@ const Register = () => {
                 </div>
               </div>
 
-              <button type="submit" className="w-full mt-2 py-2.5 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition">
-                Register
+              <button type="submit" className="w-full mt-2 py-2.5 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition disabled:opacity-50" disabled={isLoading}>
+                {isLoading ? 'Registering...' : 'Register'}
               </button>
 
               <p className="text-sm text-gray-500 text-center mt-3">

@@ -1,23 +1,33 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import RuralmartLogo from '../../assets/RuralmartLogo.jpg';
+import { forgotPassword } from '../../redux/actions/userActions';
+import { selectUserLoading, selectUserSuccess, selectUserFailure, selectUserErrorMessage } from '../../redux/selectors/userSelectors';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
+  const [localError, setLocalError] = useState('');
+
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const isLoading = useSelector(selectUserLoading);
+  const isSuccess = useSelector(selectUserSuccess);
+  const isError = useSelector(selectUserFailure);
+  const errorMessage = useSelector(selectUserErrorMessage);
 
   function handleSubmit(e) {
     e.preventDefault();
-    setMessage('');
+    setLocalError('');
+
     if (!email) {
-      setMessage('Please enter your email address.');
+      setLocalError('Please enter your email address.');
       return;
     }
 
-    // TODO: dispatch forgot-password action to backend
-    setMessage('If this email exists, a reset link has been sent.');
-  }
+    dispatch(forgotPassword(email));
+};    
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 p-4">
@@ -32,7 +42,9 @@ const ForgotPassword = () => {
 
         <div className="w-full md:w-1/2 p-8 md:p-12">
           <h2 className="text-3xl font-bold text-gray-800 mb-4 text-center md:text-left">Forgot Password</h2>
-          {message && <p className="text-sm text-emerald-600 mb-4">{message}</p>}
+          {localError && <p className="text-sm text-red-600 mb-4">{localError}</p>}
+          {isSuccess && <p className="text-sm text-emerald-600 mb-4">If this email exists, a reset link has been sent.</p>}
+          {isError && <p className="text-sm text-red-600 mb-4">{errorMessage || 'Failed to send reset email.'}</p>}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -49,8 +61,12 @@ const ForgotPassword = () => {
               />
             </div>
 
-            <button type="submit" className="w-full py-3 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition">
-              Send reset link
+            <button
+              type="submit"
+              className="w-full py-3 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition disabled:opacity-50"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Sending...' : 'Send reset link'}
             </button>
 
             <p className="text-sm text-center text-gray-500">

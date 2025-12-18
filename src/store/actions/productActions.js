@@ -1,1 +1,0 @@
-// Product-related actions (fetch products, add to cart, etc.)

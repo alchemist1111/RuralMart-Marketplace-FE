@@ -1,1 +1,0 @@
-// Products state management (product list, product details)
